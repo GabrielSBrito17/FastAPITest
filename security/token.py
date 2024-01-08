@@ -10,9 +10,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def verify_user(db: Session, username: str, password: str):
     user = get_user_by_username(db, username)
-    if not user or not Security.verify_password(password, user.hashed_password):
+    print(user)
+    if not user or not Security.verify_password(password, user.password):
         return None
     return user
 
 def get_user_permissions(user):
-    return {"is_superuser": user.is_superuser}
+    return ["is_superuser"] if user.is_superuser else []

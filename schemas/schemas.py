@@ -7,6 +7,15 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    is_active: Optional[bool] = True
+    is_superuser: Optional[bool] = False
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
 
 class User(UserBase):
     id: int

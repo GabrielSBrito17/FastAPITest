@@ -13,7 +13,7 @@ SECRET_KEY = secret_key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # Adicione esta linha
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class TokenData:
     username: str | None = None
@@ -44,7 +44,10 @@ class Security:
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(minutes=15)
-        to_encode.update({"exp": expire})
+
+        scopes = data.get("scopes", [])
+
+        to_encode.update({"exp": expire, "scopes": scopes})
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
@@ -52,10 +55,12 @@ class Security:
     def decode_token(token: str, credentials_exception):
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            print(payload)
             username: str = payload.get("sub")
             if username is None:
                 raise credentials_exception
-            token_data = TokenData(username=username)
+            scopes: List[str] = payload.get("scopes", [])
+            token_data = UserToken(username=username, scopes=scopes)
         except JWTError:
             raise credentials_exception
         return token_data

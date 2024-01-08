@@ -1,0 +1,32 @@
+version: '3'
+services:
+  db:
+    container_name: db-fastapi
+    image: postgres
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=root
+    ports:
+      - 5432:5432
+    networks:
+      - portapi
+
+  app:
+    build: .
+    container_name: fastapi-api
+    ports:
+      - 80:80
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:root@db:5432/fastapi
+    networks:
+      - portapi
+    command: sh -c "sleep 10 && uvicorn main:app --host 0.0.0.0 --port 80"
+volumes:
+  pgdata:
+networks:
+  portapi:
+    driver: bridge
