@@ -5,6 +5,7 @@ services:
     image: postgres
     restart: always
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - pgdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=root
@@ -21,12 +22,13 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgres://postgres:root@db:5432/fastapi
+      - DATABASE_URL=postgresql://postgres:root@db:5432/fastapi
     networks:
       - portapi
-    command: sh -c "sleep 10 && uvicorn main:app --host 0.0.0.0 --port 80"
+    command: sh -c "alembic upgrade head && sleep 1 && uvicorn main:app --host 0.0.0.0 --port 80"
 volumes:
   pgdata:
+
 networks:
   portapi:
     driver: bridge

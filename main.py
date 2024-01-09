@@ -2,7 +2,6 @@ from fastapi import FastAPI
 import uvicorn
 import routers.users as users
 from database.database import engine, Base
-import routers.token as routes
 
 app = FastAPI()
 

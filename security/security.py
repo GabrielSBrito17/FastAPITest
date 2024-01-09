@@ -55,7 +55,6 @@ class Security:
     def decode_token(token: str, credentials_exception):
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            print(payload)
             username: str = payload.get("sub")
             if username is None:
                 raise credentials_exception
