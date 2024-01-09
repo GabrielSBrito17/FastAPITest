@@ -39,15 +39,9 @@ class Security:
 
     @staticmethod
     def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=15)
-
+        expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
         scopes = data.get("scopes", [])
-
-        to_encode.update({"exp": expire, "scopes": scopes})
+        to_encode = {**data, "exp": expire, "scopes": scopes}
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
@@ -59,10 +53,9 @@ class Security:
             if username is None:
                 raise credentials_exception
             scopes: List[str] = payload.get("scopes", [])
-            token_data = UserToken(username=username, scopes=scopes)
+            return UserToken(username=username, scopes=scopes)
         except JWTError:
             raise credentials_exception
-        return token_data
 
     @staticmethod
     def get_current_user(token: str = Depends(oauth2_scheme)):
